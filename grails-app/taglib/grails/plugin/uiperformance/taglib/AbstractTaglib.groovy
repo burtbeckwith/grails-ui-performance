@@ -1,0 +1,72 @@
+package grails.plugin.uiperformance.taglib
+
+/**
+ * Abstract base class for taglibs.
+ *
+ * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
+ */
+abstract class AbstractTaglib {
+
+	def pluginManager
+	def uiPerformanceService
+
+	/**
+	 * Generates html for attributes not explicitly handled.
+	 * <p/>
+	 * Remove all handled attributes before calling this, e.g.
+	 * <code>attrs.remove 'border'</code>
+	 *
+	 * @param attrs  the attribute map
+	 * @return  html for extra attributes
+	 */
+	protected String generateExtraAttributes(attrs) {
+		StringBuilder extra = new StringBuilder()
+		attrs.each { key, value ->
+			extra.append ' '
+			extra.append key
+			extra.append '="'
+			extra.append value
+			extra.append '"'
+		}
+		extra.toString()
+	}
+
+	protected String generateRelativePath(dir, name, extension, plugin, absolute) {
+
+		boolean cdn = uiPerformanceService.cdnIsEnabled()
+
+		StringBuilder path
+		if (cdn) {
+			path = new StringBuilder(uiPerformanceService.getCdnPath())
+		}
+		else {
+			if ('true' == absolute) {
+				return name
+			}
+		}
+
+		if (!cdn) {
+			String baseUri = grailsAttributes.getApplicationUri(request)
+			path = new StringBuilder(baseUri)
+			if (!baseUri.endsWith('/')) {
+				path.append '/'
+			}
+		}
+
+		String requestPluginContext = plugin ? pluginManager.getPluginPath(plugin) : ''
+		if (requestPluginContext) {
+			path.append (requestPluginContext.startsWith('/') ? requestPluginContext.substring(1) : requestPluginContext)
+			path.append '/'
+		}
+		if (dir) {
+			path.append dir
+			path.append '/'
+		}
+		path.append name
+		if (extension) {
+			path.append extension
+		}
+
+		path.toString().replaceAll('//', '/')
+	}
+}
