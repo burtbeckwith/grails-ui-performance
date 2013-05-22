@@ -14,6 +14,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.codehaus.groovy.grails.commons.GrailsApplication;
 import org.codehaus.groovy.grails.plugins.support.aware.GrailsApplicationAware;
 import org.springframework.util.AntPathMatcher;
@@ -26,6 +28,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
 public class CacheFilter extends OncePerRequestFilter implements GrailsApplicationAware {
+
+  private static final Log log = LogFactory.getLog(CacheFilter.class);
 
 	protected static final List<String> DEFAULT_IMAGE_EXTENSIONS = Arrays.asList("gif", "jpg", "png", "ico");
 	protected static final long SECONDS_IN_DAY = 60 * 60 * 24;
@@ -46,11 +50,14 @@ public class CacheFilter extends OncePerRequestFilter implements GrailsApplicati
 
 		String uri = request.getRequestURI();
 
+    log.debug("Filtering request URI : " + uri);
 		if (isEnabled() && isCacheable(uri)) {
+      log.debug("UI-Performance plugin is enabled and uri is cacheable");
 			response.setDateHeader("Expires", System.currentTimeMillis() + TEN_YEARS_MILLIS);
 			response.setHeader("Cache-Control", MAX_AGE);
 			if (uri.endsWith(".gz.css") || uri.endsWith(".gz.js")) {
-				response.addHeader("Content-Encoding", "gzip");
+        log.debug("Set gzip content encoding");
+        response.addHeader("Content-Encoding", "gzip");
 				response.addHeader("Vary", "Accept-Encoding");
 			}
 		}
