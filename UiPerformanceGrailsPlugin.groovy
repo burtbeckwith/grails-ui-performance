@@ -5,8 +5,6 @@ import grails.plugin.uiperformance.postprocess.ImageTagPostProcessor
 import grails.plugin.uiperformance.postprocess.JsTagPostProcessor
 import grails.util.Environment
 
-import org.springframework.web.filter.DelegatingFilterProxy
-
 import com.planetj.servlet.filter.compression.CompressingFilter
 
 class UiPerformanceGrailsPlugin {
@@ -53,7 +51,7 @@ class UiPerformanceGrailsPlugin {
 		contextParam[contextParam.size() - 1] + {
 			'filter' {
 				'filter-name'('cacheFilter')
-				'filter-class'(DelegatingFilterProxy.name)
+				'filter-class'(CacheFilter.name)
 			}
 		}
 
