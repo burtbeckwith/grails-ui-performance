@@ -31,7 +31,7 @@ abstract class AbstractTaglib {
 		extra.toString()
 	}
 
-	protected String generateRelativePath(dir, name, extension, plugin, absolute) {
+	protected String generateRelativePath(dir, name, extension, plugin, absolute, base) {
 
 		boolean cdn = uiPerformanceService.cdnIsEnabled()
 
@@ -46,7 +46,7 @@ abstract class AbstractTaglib {
 		}
 
 		if (!cdn) {
-			String baseUri = grailsAttributes.getApplicationUri(request)
+      String baseUri = base ?: grailsAttributes.getApplicationUri(request)
 			path = new StringBuilder(baseUri)
 			if (!baseUri.endsWith('/')) {
 				path.append '/'

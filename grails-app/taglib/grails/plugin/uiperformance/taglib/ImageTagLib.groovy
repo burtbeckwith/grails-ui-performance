@@ -49,7 +49,7 @@ class ImageTagLib extends AbstractTaglib {
 		}
 
 		String link = generateRelativePath('images', attrs.remove('src'), '',
-				attrs.remove('plugin'), attrs.remove('absolute'))
+				attrs.remove('plugin'), attrs.remove('absolute'), attrs.remove('base'))
 
 		if (imageTagPostProcessor) {
 			link = imageTagPostProcessor.process(link, request, false)
@@ -77,7 +77,7 @@ class ImageTagLib extends AbstractTaglib {
 		else {
 			src = '/favicon.ico'
 		}
-		src = generateRelativePath(null, src, null, attrs.remove('plugin'), attrs.remove('absolute'))
+		src = generateRelativePath(null, src, null, attrs.remove('plugin'), attrs.remove('absolute'), attrs.remove('base'))
 
 		String rel = attrs.remove('rel') ?: 'shortcut icon'
 		String type = ext == 'ico' ? 'x-icon' : ext
@@ -103,7 +103,7 @@ class ImageTagLib extends AbstractTaglib {
 		// TODO  this should be done in the post processor
 		String spriteClass = getSpriteClass(link)
 		if (spriteClass) {
-			link = generateRelativePath('images', 'spacer.gif', '', true, false)
+			link = generateRelativePath('images', 'spacer.gif', '', true, false, attrs.remove('base'))
 
 			if (attrs.'class') {
 				attrs.'class' += " $spriteClass"
@@ -113,7 +113,7 @@ class ImageTagLib extends AbstractTaglib {
 			}
 		}
 		else {
-			link = generateRelativePath('images', link, '', attrs.remove('plugin'), attrs.remove('absolute'))
+			link = generateRelativePath('images', link, '', attrs.remove('plugin'), attrs.remove('absolute'), attrs.remove('base'))
 		}
 
 		String borderAttr = attrs.remove('border')
