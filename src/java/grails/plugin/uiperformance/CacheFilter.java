@@ -44,6 +44,7 @@ public class CacheFilter extends OncePerRequestFilter implements GrailsApplicati
 	protected AntPathMatcher pathMatcher = new AntPathMatcher();
 	protected List<String> exclusions;
 	protected GrailsApplication grailsApplication;
+  protected Boolean enabled;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
@@ -66,7 +67,14 @@ public class CacheFilter extends OncePerRequestFilter implements GrailsApplicati
 	}
 
 	protected boolean isEnabled() {
-    return UiPerformanceService.isEnabled();
+    if (enabled == null) {
+      synchronized (this) {
+        enabled = grailsApplication.getFlatConfig().containsKey("uiperformance.enabled")
+            ? (Boolean)grailsApplication.getFlatConfig().get("uiperformance.enabled")
+            : Environment.PRODUCTION == Environment.getCurrent();
+      }
+    }
+    return enabled;
 	}
 
 	protected boolean isCacheable(final String uri) {
