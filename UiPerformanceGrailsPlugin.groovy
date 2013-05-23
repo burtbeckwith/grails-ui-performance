@@ -3,6 +3,7 @@ import grails.plugin.uiperformance.ResourceVersionHelper
 import grails.plugin.uiperformance.postprocess.CssTagPostProcessor
 import grails.plugin.uiperformance.postprocess.ImageTagPostProcessor
 import grails.plugin.uiperformance.postprocess.JsTagPostProcessor
+import grails.plugin.uiperformance.postprocess.SwfTagPostProcessor
 import grails.util.Environment
 
 import com.planetj.servlet.filter.compression.CompressingFilter
@@ -34,6 +35,9 @@ class UiPerformanceGrailsPlugin {
 		jsTagPostProcessor(JsTagPostProcessor) { bean ->
 			bean.autowire = 'byName'
 		}
+    swfTagPostProcessor(SwfTagPostProcessor) { bean ->
+      bean.autowire = 'byName'
+    }
 
 		resourceVersionHelper(ResourceVersionHelper) {
 			uiPerformanceService = ref('uiPerformanceService')

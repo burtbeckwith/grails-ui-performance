@@ -16,12 +16,11 @@ class SwfTagLib extends AbstractTaglib {
       throwTagError("Tag [swf] is missing required attribute [name]")
     }
     String dir = attrs.remove('dir')
-    if (!name) {
+    if (!dir) {
       throwTagError("Tag [swf] is missing required attribute [dir]")
     }
-    String base = attrs.remove('base')
-
-    String link = g.resource(dir: dir, file: "${name}.swf", base: base)
+    String link = generateRelativePath(dir, name, '.swf',
+        attrs.remove('plugin'), attrs.remove('absolute'), attrs.remove('base'))
 
     if (swfTagPostProcessor) {
        link = swfTagPostProcessor.process(link, request, false)
