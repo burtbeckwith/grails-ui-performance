@@ -1,8 +1,3 @@
-/*
- * Copyright Balsamiq Studios, Inc.  All rights reserved.  http://www.balsamiq.com
- *
- */
-
 package grails.plugin.uiperformance.taglib
 
 class SwfTagLib extends AbstractTaglib {
