@@ -43,7 +43,9 @@ class UiPerformanceGrailsPlugin {
 			uiPerformanceService = ref('uiPerformanceService')
 		}
 
-		cacheFilter(CacheFilter)
+		cacheFilter(CacheFilter) {
+      uiPerformanceService = ref('uiPerformanceService')
+    }
 	}
 
 	def doWithWebDescriptor = { xml ->

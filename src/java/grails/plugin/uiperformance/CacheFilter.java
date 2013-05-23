@@ -44,7 +44,7 @@ public class CacheFilter extends OncePerRequestFilter implements GrailsApplicati
 	protected AntPathMatcher pathMatcher = new AntPathMatcher();
 	protected List<String> exclusions;
 	protected GrailsApplication grailsApplication;
-  protected Boolean enabled;
+  protected UiPerformanceService uiPerformanceService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
@@ -52,7 +52,7 @@ public class CacheFilter extends OncePerRequestFilter implements GrailsApplicati
 		String uri = request.getRequestURI();
 
     log.debug("Filtering request URI : " + uri);
-		if (isEnabled() && isCacheable(uri)) {
+		if (uiPerformanceService.isEnabled() && isCacheable(uri)) {
       log.debug("UI-Performance plugin is enabled and uri is cacheable");
 			response.setDateHeader("Expires", System.currentTimeMillis() + TEN_YEARS_MILLIS);
 			response.setHeader("Cache-Control", MAX_AGE);
@@ -64,17 +64,6 @@ public class CacheFilter extends OncePerRequestFilter implements GrailsApplicati
 		}
 
 		chain.doFilter(request, response);
-	}
-
-	protected boolean isEnabled() {
-    if (enabled == null) {
-      synchronized (this) {
-        enabled = grailsApplication.getFlatConfig().containsKey("uiperformance.enabled")
-            ? (Boolean)grailsApplication.getFlatConfig().get("uiperformance.enabled")
-            : Environment.PRODUCTION == Environment.getCurrent();
-      }
-    }
-    return enabled;
 	}
 
 	protected boolean isCacheable(final String uri) {
@@ -167,4 +156,8 @@ public class CacheFilter extends OncePerRequestFilter implements GrailsApplicati
 	public void setGrailsApplication(GrailsApplication app) {
 		grailsApplication = app;
 	}
+
+  public void setUiPerformanceService(UiPerformanceService uiPerformanceService) {
+    this.uiPerformanceService = uiPerformanceService;
+  }
 }
