@@ -107,13 +107,6 @@ class UiPerformanceGrailsPlugin {
 		}
 
 		def filter = xml.'filter'
-		filter[filter.size() - 1] + {
-			'filter-mapping' {
-				'filter-name'('cacheFilter')
-				'url-pattern'('/*')
-			}
-		}
-
 		if (htmlConfig.compress) {
 			filter[filter.size() - 1] + {
 				if (!htmlConfig.urlPatterns) {
@@ -128,6 +121,12 @@ class UiPerformanceGrailsPlugin {
 				}
 			}
 		}
+    filter[filter.size() - 1] + {
+      'filter-mapping' {
+        'filter-name'('cacheFilter')
+        'url-pattern'('/*')
+      }
+    }
 	}
 
 	private boolean isEnabled(application) {
