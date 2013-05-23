@@ -26,9 +26,14 @@ class UiPerformanceService implements InitializingBean {
 
 	public static final List<String> DEFAULT_IMAGE_EXTENSIONS = ['gif', 'jpg', 'png', 'ico']
 
-  private enabled = null
+  @Lazy
+  volatile boolean enabled = {
+    grailsApplication.getFlatConfig().containsKey("uiperformance.enabled") ?
+      grailsApplication.getFlatConfig().get("uiperformance.enabled") :
+      Environment.PRODUCTION == Environment.getCurrent()
+  }()
 
-	def grailsApplication
+  def grailsApplication
 	def resourceVersionHelper
 
 	static transactional = false
@@ -169,16 +174,9 @@ class UiPerformanceService implements InitializingBean {
 		return value ?: defaultIfMissing
 	}
 
-	boolean isEnabled() {
-    if (enabled == null) {
-      synchronized (this) {
-        enabled = grailsApplication.getFlatConfig().containsKey("uiperformance.enabled") ?
-          (Boolean)grailsApplication.getFlatConfig().get("uiperformance.enabled") :
-          Environment.PRODUCTION == Environment.getCurrent()
-      }
-    }
-    enabled
-	}
+  boolean isEnabled() {
+    getEnabled()
+  }
 
 	boolean cdnIsEnabled() {
 		def cdn = grailsApplication.config.uiperformance.cdn
