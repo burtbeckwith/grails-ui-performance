@@ -35,6 +35,7 @@ class CacheFilterTests extends AbstractUiPerformanceTest {
 		filter.EXTENSIONS.clear()
 		filter.EXTENSIONS.addAll EXTENSIONS
 		filter.grailsApplication = grailsApplication
+    filter.uiPerformanceService = uiPerformanceService
 	}
 
 	void testDoFilter() {
@@ -77,6 +78,10 @@ class CacheFilterTests extends AbstractUiPerformanceTest {
 
 		// not prod
 		flatConfig['uiperformance.enabled'] = false
+    def newUiPerformanceService = new UiPerformanceService()
+    newUiPerformanceService.grailsApplication = grailsApplication
+    newUiPerformanceService.resourceVersionHelper = resourceVersionHelper
+    filter.uiPerformanceService = newUiPerformanceService
 		request.requestURI = '/css/bar__v123.gz.css'
 		response.reset()
 		filter.doFilter request, response, filterChain

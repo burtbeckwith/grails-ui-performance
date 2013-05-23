@@ -59,10 +59,10 @@ abstract class AbstractTaglib {
 			path.append '/'
 		}
 		if (dir) {
-			path.append dir
+      path.append (dir.startsWith('/') ? dir.substring(1) : dir)
 			path.append '/'
 		}
-		path.append name
+		path.append (name.startsWith('/') ? name.substring(1) : name)
 		if (extension) {
 			path.append extension
 		}
