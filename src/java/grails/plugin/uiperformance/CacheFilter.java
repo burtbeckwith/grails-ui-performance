@@ -66,11 +66,7 @@ public class CacheFilter extends OncePerRequestFilter implements GrailsApplicati
 	}
 
 	protected boolean isEnabled() {
-		if (grailsApplication.getFlatConfig().containsKey("uiperformance.enabled")) {
-			return (Boolean)grailsApplication.getFlatConfig().get("uiperformance.enabled");
-		}
-
-		return Environment.PRODUCTION == Environment.getCurrent();
+    return UiPerformanceService.isEnabled();
 	}
 
 	protected boolean isCacheable(final String uri) {
