@@ -67,6 +67,6 @@ abstract class AbstractTaglib {
 			path.append extension
 		}
 
-		path.toString().replaceAll('//', '/')
+		path.toString()
 	}
 }
