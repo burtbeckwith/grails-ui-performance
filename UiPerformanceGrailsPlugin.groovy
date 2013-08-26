@@ -4,6 +4,7 @@ import grails.plugin.uiperformance.postprocess.CssTagPostProcessor
 import grails.plugin.uiperformance.postprocess.ImageTagPostProcessor
 import grails.plugin.uiperformance.postprocess.JsTagPostProcessor
 import grails.plugin.uiperformance.postprocess.SwfTagPostProcessor
+import grails.plugin.webxml.FilterManager
 import grails.util.Environment
 
 import com.planetj.servlet.filter.compression.CompressingFilter
@@ -47,6 +48,10 @@ class UiPerformanceGrailsPlugin {
       uiPerformanceService = ref('uiPerformanceService')
     }
 	}
+  def getWebXmlFilterOrder() {
+    [cacheFilter: FilterManager.DEFAULT_POSITION + 100, "${CompressingFilter.name}":FilterManager.DEFAULT_POSITION + 101]
+  }
+
 
 	def doWithWebDescriptor = { xml ->
 
@@ -112,25 +117,22 @@ class UiPerformanceGrailsPlugin {
 			}
 		}
 
-		def filter = xml.'filter'
-		if (htmlConfig.compress) {
-			filter[filter.size() - 1] + {
-				if (!htmlConfig.urlPatterns) {
-					htmlConfig.urlPatterns = ['/*']
-				}
-
-				for (pattern in htmlConfig.urlPatterns) {
-					'filter-mapping' {
-						'filter-name'(CompressingFilter.name)
-						'url-pattern'(pattern)
-					}
-				}
-			}
-		}
-    filter[filter.size() - 1] + {
+		def filter = xml.'filter-mapping'.find { it.'filter-name'.text() == "charEncodingFilter" }
+    filter + {
       'filter-mapping' {
         'filter-name'('cacheFilter')
         'url-pattern'('/*')
+      }
+      if (htmlConfig.compress) {
+        if (!htmlConfig.urlPatterns) {
+          htmlConfig.urlPatterns = ['/*']
+        }
+        for (pattern in htmlConfig.urlPatterns) {
+          'filter-mapping' {
+            'filter-name'(CompressingFilter.name)
+            'url-pattern'(pattern)
+          }
+        }
       }
     }
 	}
