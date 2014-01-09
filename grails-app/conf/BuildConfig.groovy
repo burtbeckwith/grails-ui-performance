@@ -32,22 +32,16 @@ grails.project.dependency.resolution = {
 		build 'net.java.dev.jets3t:jets3t:0.9.0', {
 			excludes 'commons-codec', 'commons-logging', 'httpclient', 'httpcore', 'java-xmlbuilder'
 		}
-		build 'org.apache.httpcomponents:httpclient:4.1.2', {
-			excludes 'commons-codec', 'commons-logging', 'httpcore', 'junit', 'mockito-core'
-		}
-		build 'org.apache.httpcomponents:httpcore:4.1.2', {
-			excludes 'junit'
-		}
 		build 'com.jamesmurty.utils:java-xmlbuilder:0.4', {
 			excludes 'junit'
 		}
 	}
 
 	plugins {
-    compile ':webxml:1.4.1'
+    build ':release:3.0.1', {
+      export = false
+    }
 
-    build ':release:2.2.1', ':rest-client-builder:1.0.3', {
-			export = false
-		}
+    compile ':webxml:1.4.1'
 	}
 }
