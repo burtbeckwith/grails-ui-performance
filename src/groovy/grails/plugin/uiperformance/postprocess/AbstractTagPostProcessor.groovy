@@ -16,36 +16,23 @@ abstract class AbstractTagPostProcessor {
 			return html
 		}
 
-		for (ext in extensions) {
-			int indexExt = html.indexOf(".$ext")
-			if (indexExt == -1) {
-				continue
-			}
-
-			String quote = "'"
-			int indexQuoteEnd = quoted ? html.indexOf(quote, indexExt) : html.length()
-			if (indexQuoteEnd == -1) {
-				quote = '"'
-				indexQuoteEnd = html.indexOf('"', indexExt)
-				if (indexQuoteEnd == -1) {
-					continue
-				}
-			}
-
-			int indexQuoteStart = quoted ? html.length() - html.reverse().indexOf(
-					quote, html.length() - indexQuoteEnd + 1) : 0
-			String path = html.substring(indexQuoteStart, indexQuoteEnd)
-
-			String name = uiPerformanceService.addVersion(path)
-			if (gzip && !uiPerformanceService.isExcluded(path)) {
-				String ae = request.getHeader('accept-encoding')
-				if (ae && ae.contains('gzip')) {
-					name = (name - ".$ext") + ".gz.$ext"
-				}
-			}
-
-			return html.substring(0, indexQuoteStart) + name + html.substring(indexQuoteEnd)
-		}
+    for (ext in extensions) {
+      def matcher = html =~  /((?:[^'\s=]*\.$ext[^'\s]*)|(?:[^"\s=]*\.$ext[^"\s]*))/
+      if (!matcher.size()) {
+        continue
+      }
+      String path = matcher[0][0]
+      if (!uiPerformanceService.isExcluded(path)) {
+        String name = uiPerformanceService.addVersion(path)
+        if (gzip) {
+          String ae = request.getHeader('accept-encoding')
+          if (ae && ae.contains('gzip') && !ae.contains('gzip;q=0')) {
+            name = name.replace(".$ext", ".gz.$ext")
+          }
+        }
+        return html.replace(path, name)
+      }
+    }
 
 		return html
 	}

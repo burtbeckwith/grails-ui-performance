@@ -3,11 +3,12 @@ import grails.plugin.uiperformance.ResourceVersionHelper
 import grails.plugin.uiperformance.postprocess.CssTagPostProcessor
 import grails.plugin.uiperformance.postprocess.ImageTagPostProcessor
 import grails.plugin.uiperformance.postprocess.JsTagPostProcessor
+import grails.plugin.uiperformance.postprocess.SwfTagPostProcessor
+import grails.plugin.webxml.FilterManager
 import grails.util.Environment
 
-import org.springframework.web.filter.DelegatingFilterProxy
-
 import com.planetj.servlet.filter.compression.CompressingFilter
+import org.springframework.web.filter.DelegatingFilterProxy
 
 class UiPerformanceGrailsPlugin {
 
@@ -35,13 +36,22 @@ class UiPerformanceGrailsPlugin {
 		jsTagPostProcessor(JsTagPostProcessor) { bean ->
 			bean.autowire = 'byName'
 		}
+    swfTagPostProcessor(SwfTagPostProcessor) { bean ->
+      bean.autowire = 'byName'
+    }
 
 		resourceVersionHelper(ResourceVersionHelper) {
 			uiPerformanceService = ref('uiPerformanceService')
 		}
 
-		cacheFilter(CacheFilter)
+		cacheFilter(CacheFilter) {
+      uiPerformanceService = ref('uiPerformanceService')
+    }
 	}
+  def getWebXmlFilterOrder() {
+    [cacheFilter: FilterManager.DEFAULT_POSITION + 100, "${CompressingFilter.name}":FilterManager.DEFAULT_POSITION + 101]
+  }
+
 
 	def doWithWebDescriptor = { xml ->
 
@@ -107,28 +117,24 @@ class UiPerformanceGrailsPlugin {
 			}
 		}
 
-		def filter = xml.'filter'
-		filter[filter.size() - 1] + {
-			'filter-mapping' {
-				'filter-name'('cacheFilter')
-				'url-pattern'('/*')
-			}
-		}
-
-		if (htmlConfig.compress) {
-			filter[filter.size() - 1] + {
-				if (!htmlConfig.urlPatterns) {
-					htmlConfig.urlPatterns = ['/*']
-				}
-
-				for (pattern in htmlConfig.urlPatterns) {
-					'filter-mapping' {
-						'filter-name'(CompressingFilter.name)
-						'url-pattern'(pattern)
-					}
-				}
-			}
-		}
+		def filter = xml.'filter-mapping'.find { it.'filter-name'.text() == "charEncodingFilter" }
+    filter + {
+      'filter-mapping' {
+        'filter-name'('cacheFilter')
+        'url-pattern'('/*')
+      }
+      if (htmlConfig.compress) {
+        if (!htmlConfig.urlPatterns) {
+          htmlConfig.urlPatterns = ['/*']
+        }
+        for (pattern in htmlConfig.urlPatterns) {
+          'filter-mapping' {
+            'filter-name'(CompressingFilter.name)
+            'url-pattern'(pattern)
+          }
+        }
+      }
+    }
 	}
 
 	private boolean isEnabled(application) {

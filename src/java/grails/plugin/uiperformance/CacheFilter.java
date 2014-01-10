@@ -14,6 +14,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.codehaus.groovy.grails.commons.GrailsApplication;
 import org.codehaus.groovy.grails.plugins.support.aware.GrailsApplicationAware;
 import org.springframework.util.AntPathMatcher;
@@ -26,6 +28,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
 public class CacheFilter extends OncePerRequestFilter implements GrailsApplicationAware {
+
+  private static final Log log = LogFactory.getLog(CacheFilter.class);
 
 	protected static final List<String> DEFAULT_IMAGE_EXTENSIONS = Arrays.asList("gif", "jpg", "png", "ico");
 	protected static final long SECONDS_IN_DAY = 60 * 60 * 24;
@@ -40,30 +44,26 @@ public class CacheFilter extends OncePerRequestFilter implements GrailsApplicati
 	protected AntPathMatcher pathMatcher = new AntPathMatcher();
 	protected List<String> exclusions;
 	protected GrailsApplication grailsApplication;
+  protected UiPerformanceService uiPerformanceService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
 
 		String uri = request.getRequestURI();
 
-		if (isEnabled() && isCacheable(uri)) {
+    log.debug("Filtering request URI : " + uri);
+		if (uiPerformanceService.isEnabled() && isCacheable(uri)) {
+      log.debug("UI-Performance plugin is enabled and uri is cacheable");
 			response.setDateHeader("Expires", System.currentTimeMillis() + TEN_YEARS_MILLIS);
 			response.setHeader("Cache-Control", MAX_AGE);
 			if (uri.endsWith(".gz.css") || uri.endsWith(".gz.js")) {
-				response.addHeader("Content-Encoding", "gzip");
+        log.debug("Set gzip content encoding");
+        response.addHeader("Content-Encoding", "gzip");
 				response.addHeader("Vary", "Accept-Encoding");
 			}
 		}
 
 		chain.doFilter(request, response);
-	}
-
-	protected boolean isEnabled() {
-		if (grailsApplication.getFlatConfig().containsKey("uiperformance.enabled")) {
-			return (Boolean)grailsApplication.getFlatConfig().get("uiperformance.enabled");
-		}
-
-		return Environment.PRODUCTION == Environment.getCurrent();
 	}
 
 	protected boolean isCacheable(final String uri) {
@@ -156,4 +156,8 @@ public class CacheFilter extends OncePerRequestFilter implements GrailsApplicati
 	public void setGrailsApplication(GrailsApplication app) {
 		grailsApplication = app;
 	}
+
+  public void setUiPerformanceService(UiPerformanceService uiPerformanceService) {
+    this.uiPerformanceService = uiPerformanceService;
+  }
 }

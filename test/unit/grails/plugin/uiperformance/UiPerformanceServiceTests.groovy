@@ -25,12 +25,12 @@ class UiPerformanceServiceTests extends AbstractUiPerformanceTest {
 			enabled: true,
 			cdn: [
 				enabled: true,
-				location: 'http:////www.foo.bar'
+				location: 'http://www.foo.bar'
 			] as ConfigObject
 		] as ConfigObject
 		flattenConfig()
 
-		assertEquals 'http:////www.foo.bar/', uiPerformanceService.getCdnPath()
+		assertEquals 'http://www.foo.bar/', uiPerformanceService.getCdnPath()
 	}
 
 	void testGetCdnPathS3() {
@@ -48,7 +48,7 @@ class UiPerformanceServiceTests extends AbstractUiPerformanceTest {
 		] as ConfigObject
 		flattenConfig()
 
-		assertEquals 'http:////s3.amazonaws.com/subbucket.bucket/123/', uiPerformanceService.getCdnPath()
+		assertEquals 'http://s3.amazonaws.com/subbucket.bucket/123/', uiPerformanceService.getCdnPath()
 	}
 
 	void testGetCdnPathCloudFront() {
@@ -70,6 +70,6 @@ class UiPerformanceServiceTests extends AbstractUiPerformanceTest {
 		] as ConfigObject
 		flattenConfig()
 
-		assertEquals 'http:////cloudfront.myhome.com/123/', uiPerformanceService.getCdnPath()
+		assertEquals 'http://cloudfront.myhome.com/123/', uiPerformanceService.getCdnPath()
 	}
 }

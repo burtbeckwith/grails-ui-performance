@@ -5,3 +5,5 @@ log4j = {
 	      'net.sf.ehcache.hibernate'
 	debug 'grails.plugin.uiperformance'
 }
+grails.views.default.codec="none" // none, html, base64
+grails.views.gsp.encoding="UTF-8"

@@ -26,7 +26,14 @@ class UiPerformanceService implements InitializingBean {
 
 	public static final List<String> DEFAULT_IMAGE_EXTENSIONS = ['gif', 'jpg', 'png', 'ico']
 
-	def grailsApplication
+  @Lazy
+  volatile boolean enabled = {
+    grailsApplication.getFlatConfig().containsKey("uiperformance.enabled") ?
+      grailsApplication.getFlatConfig().get("uiperformance.enabled") :
+      Environment.PRODUCTION == Environment.getCurrent()
+  }()
+
+  def grailsApplication
 	def resourceVersionHelper
 
 	static transactional = false
@@ -167,13 +174,9 @@ class UiPerformanceService implements InitializingBean {
 		return value ?: defaultIfMissing
 	}
 
-	boolean isEnabled() {
-		if (grailsApplication.flatConfig.containsKey('uiperformance.enabled')) {
-			return grailsApplication.config.uiperformance.enabled
-		}
-
-		Environment.PRODUCTION == Environment.current
-	}
+  boolean isEnabled() {
+    getEnabled()
+  }
 
 	boolean cdnIsEnabled() {
 		def cdn = grailsApplication.config.uiperformance.cdn
@@ -187,13 +190,13 @@ class UiPerformanceService implements InitializingBean {
 				if (cdn.s3.enabled || cdn.cloudFront.enabled) {
 					if (cdn.cloudFront.enabled) {
 						String cname = cdn.cloudFront.CName ?: 'ERROR : uiperformance.cdn.cloudFront.CName not set'
-						cdnPath = "http:////$cname/"
+						cdnPath = "http://$cname/"
 					}
 					else {
 						String bucketName = cdn.s3.bucketName ?: 'ERROR : uiperformance.cdn.s3.bucketname not set'
 						String domain = cdn.s3.domain ?: 'ERROR : uiperformance.cdn.s3.domain not set'
-//						cdnPath = "http:////${bucketName}.$domain/"
-						cdnPath = "http:////$domain/$bucketName/"
+//						cdnPath = "http://${bucketName}.$domain/"
+						cdnPath = "http://$domain/$bucketName/"
 					}
 					cdnPath += "${getApplicationVersion()}/"
 				}

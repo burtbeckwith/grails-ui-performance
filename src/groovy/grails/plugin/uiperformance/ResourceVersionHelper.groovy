@@ -78,7 +78,7 @@ class ResourceVersionHelper {
 
 		createPropertiesFile stagingDir, version, spritePaths
 
-		createBundles stagingDir, charset, config
+      createBundles stagingDir, charset, config
 
 		def jsErrorReporter = new JsErrorReporter()
 		boolean processJS = uiPerformanceService.getConfigBoolean('processJS')
@@ -165,6 +165,11 @@ class ResourceVersionHelper {
 				}
 			}
 		}
+
+    // Support for .swf files
+    if (file.name.toLowerCase().endsWith('.swf')) {
+      renameWithVersion file, version, keepOriginals
+    }
 	}
 
 	protected void renameWithVersion(file, String version, boolean keepOriginals) {
